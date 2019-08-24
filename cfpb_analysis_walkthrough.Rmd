@@ -1,26 +1,60 @@
 ---
 title: "Analysis_Walkthrough"
 author: "Evan Fradkin"
-date: "24/08/2019"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-### Read in t
+### Read in the data
 ```{r}
 library(tidyverse)
 library(janitor)
+
 # Read in the data
 complaints <- read_csv("Consumer_Complaints.csv")
 
 # Organize the column names into an easier format to type e.g. snake_case
-complaints <- complaints %>% janitro::clean_names()
+complaints <- complaints %>% janitor::clean_names()
+
+```
+
+## A few questions initial questions to ask might which companies receive the most complainst and what products receive the most complaints
+
+### Unsuprisingly, Equifax and Experian had the most consumer complaints. Most, likley because of their highly publicized data leaks. We can also see that mortgages are mentioned most in the complaints. This might be happening because taking out a mortgages is one of the most important financial decisions people make. Coming in second place in the product category is an expansive category which includes credit monitoring which lines up with the idea that people are upset about Experian et. al leaking their data.  
+
+```{r}
+# Which companies had the most complaints
+complaints %>% 
+        count(company, sort = TRUE) %>% 
+        head(5) %>% 
+        mutate(company = fct_reorder(company, n)) %>% 
+        ggplot(aes(company, n)) +
+        geom_col() +
+        coord_flip()
+
+# Which products do consumers complain about the most 
+
+complaints %>% 
+        count(product, sort = TRUE) %>% 
+        head(5) %>% 
+        mutate(product = fct_reorder(product, n)) %>% 
+        ggplot(aes(product, n)) +
+        geom_col() +
+        coord_flip()
+
 
 
 
 ```
+
+## 
+
+
+
+
+
 
 
 
