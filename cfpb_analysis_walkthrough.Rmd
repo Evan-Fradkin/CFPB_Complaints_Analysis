@@ -25,9 +25,6 @@ complaints <- complaints %>% janitor::clean_names()
 
 ### Unsuprisingly, Equifax and Experian have the most consumer complaints. One reason behind this might be that, with Transunion, Equifax and Experian dominate the credit rating market and as consequence almost all of the United States interacts with these comapnies in some form. We can also see that an expansive product category which includes credit monitoring has the monst complaints.  
 
-
-We can also see that mortgages are mentioned most in the complaints. This might be happening because taking out a mortgages is one of the most important financial decisions people make. Coming in second place in the product category is an expansive category which includes credit monitoring which lines up with the idea that people are upset about Experian et. al leaking their data.  
-
 ```{r}
 # Which companies had the most complaints
 complaints %>% 
