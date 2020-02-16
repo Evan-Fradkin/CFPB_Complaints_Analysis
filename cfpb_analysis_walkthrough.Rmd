@@ -46,6 +46,14 @@ complaints %>%
 
 ```
 
+# Which type of resolution is the most common (of complaitns filed) 
+```{r}
+
+complaints %>% distinct(company_response_to_consumer)
+
+complaints %>% filter(is.na(company_response_to_consumer))
+
+```
 
 
 
@@ -56,9 +64,6 @@ complaints %>%
 ```{r}
 library(tidytext)
 library(widyr)
-
-complaints %>% distinct(company_response_to_consumer)
-
 
 narratives <- complaints %>% 
         select(consumer_complaint_narrative, product, issue, sub_issue) %>% 
