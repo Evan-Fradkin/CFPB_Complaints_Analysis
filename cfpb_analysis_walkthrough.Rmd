@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
 library(dtplyr)
-
 # Read in the data
 complaints <- read_csv("complaints_2020.csv")
 
@@ -23,7 +22,7 @@ complaints <- complaints %>% janitor::clean_names()
 
 ## A few initial questions to ask might be which companies receive the most complainst and what products receive the most complaints
 
-### Unsuprisingly, Equifax and Experian have the most consumer complaints. One reason behind this might be that, with Transunion, Equifax and Experian dominate the credit rating market and as consequence almost all of the United States interacts with these comapnies in some form. We can also see that an expansive product category which includes credit monitoring has the monst complaints.  
+### Unsuprisingly, Equifax and Experian have the most consumer complaints. One reason behind this might be that, with Transunion, Equifax and Experian dominate the credit rating market and as a consequence almost all of the United States interacts with these comapnies in some form. We can also see that an expansive product category which includes credit monitoring has the most complaints.  
 
 ```{r}
 # Which companies had the most complaints
@@ -45,19 +44,74 @@ complaints %>%
         geom_col() +
         coord_flip()
 
+```
 
-complaints %>% 
+
+
+
+
+# One intriguing part of this dataset is that there are consumer narratives included with some of the complaints. It might be interesting to see what type of language people are using in the complaints.  
+
+
+```{r}
+library(tidytext)
+library(widyr)
+
+complaints %>% distinct(company_response_to_consumer)
+
+
+narratives <- complaints %>% 
+        select(consumer_complaint_narrative, product, issue, sub_issue) %>% 
         filter(!is.na(consumer_complaint_narrative))
+
+narratives %>% distinct(issue)
+
+narratives.tidy <- narratives %>% 
+        rowid_to_column("complaint.id")
+
+narratives.tidy <- narratives.tidy %>% 
+        unnest_tokens(word, consumer_complaint_narrative)
+
+# Need to remove the anonymization 
+narratives.tidy <- narratives.tidy
+
+narratives.tidy %>% 
+        anti_join(stop_words) %>% 
+        count(word, sort = TRUE) %>% 
+        filter(n > 10000) %>% 
+        head(10) %>% 
+        mutate(word = fct_reorder(word,n)) %>% 
+        ggplot(aes(word, n)) + 
+        geom_col() +
+        xlab(NULL) +
+        coord_flip()
+
+
+narratives.tidy %>% 
+        anti_join(stop_words) %>% 
+        distinct(complaint.id, word) %>% 
+        count(word, sort = TRUE) %>% 
+        filter(n > 10000) %>% 
+        head(10) %>% 
+        mutate(word = fct_reorder(word,n)) %>% 
+        ggplot(aes(word, n)) + 
+        geom_col() +
+        xlab(NULL) +
+        coord_flip()
+        
+# Remove duplicate words within reviews and then include words that occur more than 100000 times
+narratives.tidy %>% 
+        anti_join(stop_words) %>% 
+        distinct(complaint.id, word) %>% 
+        add_count(word) %>% 
+        filter(n >= 100000) %>% 
+        pairwise_cor(word, complaint.id, sort = TRUE)
+        
+
 
 
 
 ```
-
-## 
-
-
-
-
 
 
 
