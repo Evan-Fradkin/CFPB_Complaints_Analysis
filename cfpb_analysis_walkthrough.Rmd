@@ -11,12 +11,12 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 library(janitor)
+library(data.table)
 library(dtplyr)
+library(vroom)
 # Read in the data
-complaints <- read_csv("complaints_2020.csv")
 
-# Organize the column names into an easier format to type e.g. snake_case
-complaints <- complaints %>% janitor::clean_names()
+complaints <- vroom("complaints_2020.csv", num_threads = 1, .name_repair = janitor::make_clean_names)
 
 ```
 
@@ -27,6 +27,7 @@ complaints <- complaints %>% janitor::clean_names()
 ```{r}
 # Which companies had the most complaints
 complaints %>% 
+        as_tibble() %>% 
         count(company, sort = TRUE) %>% 
         head(5) %>% 
         mutate(company = fct_reorder(company, n)) %>% 
@@ -46,7 +47,7 @@ complaints %>%
 
 ```
 
-# Which type of resolution is the most common (of complaitns filed) 
+# Which type of resolution is the most common (of complaints filed) 
 ```{r}
 
 complaints %>% distinct(company_response_to_consumer)
