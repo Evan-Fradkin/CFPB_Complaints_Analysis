@@ -18,6 +18,8 @@ library(vroom)
 
 complaints <- vroom("complaints_2020.csv", num_threads = 1, .name_repair = janitor::make_clean_names)
 
+complaints_dt <- lazy_dt(complaints)
+
 ```
 
 ## A few initial questions to ask might be which companies receive the most complainst and what products receive the most complaints
@@ -26,7 +28,7 @@ complaints <- vroom("complaints_2020.csv", num_threads = 1, .name_repair = janit
 
 ```{r}
 # Which companies had the most complaints
-complaints %>% 
+complaints_dt %>% 
         as_tibble() %>% 
         count(company, sort = TRUE) %>% 
         head(5) %>% 
@@ -37,7 +39,8 @@ complaints %>%
 
 # Which products do consumers complain about the most 
 
-complaints %>% 
+complaints_dt %>%
+         as_tibble() %>% 
         count(product, sort = TRUE) %>% 
         head(5) %>% 
         mutate(product = fct_reorder(product, n)) %>% 
@@ -52,7 +55,11 @@ complaints %>%
 
 complaints %>% distinct(company_response_to_consumer)
 
-complaints %>% filter(is.na(company_response_to_consumer))
+complaints_dt %>% 
+        filter(!is.na(company_response_to_consumer)) %>% 
+        group_by(company_response_to_consumer) %>% 
+        summarise(n = n()) %>% 
+        mutate(percent = n/sum(n))
 
 ```
 
