@@ -14,6 +14,7 @@ library(janitor)
 library(data.table)
 library(dtplyr)
 library(vroom)
+library(tidymodels)
 # Read in the data
 
 complaints <- vroom("complaints_2020.csv", num_threads = 1, .name_repair = janitor::make_clean_names)
@@ -24,7 +25,7 @@ complaints_dt <- lazy_dt(complaints)
 
 ## A few initial questions to ask might be which companies receive the most complainst and what products receive the most complaints
 
-### Unsuprisingly, Equifax and Experian have the most consumer complaints. One reason behind this might be that, with Transunion, Equifax and Experian dominate the credit rating market and as a consequence almost all of the United States interacts with these comapnies in some form. We can also see that an expansive product category which includes credit monitoring has the most complaints.  
+### Unsuprisingly, Equifax and Experian have the most consumer complaints. Equifax and Experian dominate the credit rating market and as a consequence almost all of the United States interacts with these comapnies in some form. We can also see that an expansive product category which includes credit monitoring has the most complaints.  
 
 ```{r}
 # Which companies had the most complaints
@@ -59,11 +60,15 @@ complaints_dt %>%
         filter(!is.na(company_response_to_consumer)) %>% 
         group_by(company_response_to_consumer) %>% 
         summarise(n = n()) %>% 
-        mutate(percent = n/sum(n))
+        mutate(percent = n/sum(n)) %>% 
+        arrange(-percent)
 
 ```
 
 
+```{r}
+
+```
 
 
 # One intriguing part of this dataset is that there are consumer narratives included with some of the complaints. It might be interesting to see what type of language people are using in the complaints.  
